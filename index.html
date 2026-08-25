@@ -5,23 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Годовой план тренировок</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F7F7F4; --surface:#FFFFFF; --border:#E3E2DB; --border-strong:#CFCEC5;
-    --text:#17181A; --text-dim:#68675F; --text-faint:#A6A499;
-    --accent:#2C4A5E; --accent-soft:#EAEFF1;
-    --good:#4C6B4F; --good-soft:#EEF2EC;
-    --bad:#9A4A38; --bad-soft:#F6ECE9;
+    --bg:#101113; --surface:#1B1C1F; --surface-alt:#232427; --border:#303236; --border-strong:#45484D;
+    --text:#F3F1EC; --text-dim:#A6A29A; --text-faint:#6E6B66;
+    --accent:#FF4B26; --accent-soft:rgba(255,75,38,0.14); --accent-text:#FF8B5C;
+    --good:#3FC172; --good-soft:rgba(63,193,114,0.14);
+    --bad:#FF4136; --bad-soft:rgba(255,65,54,0.14);
   }
   *{box-sizing:border-box;}
   body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.6;font-size:14px;-webkit-font-smoothing:antialiased;}
   .mono{font-family:'IBM Plex Mono',monospace;}
+  .display{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:0.02em;}
   .wrap{max-width:1080px;margin:0 auto;padding:48px 24px 80px;}
 
-  .masthead{margin-bottom:40px;}
-  .eyebrow{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint);margin:0 0 10px;}
-  .masthead h1{font-size:28px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+  .masthead{margin-bottom:40px;padding-bottom:24px;border-bottom:3px solid var(--accent);}
+  .eyebrow{font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:var(--accent-text);margin:0 0 10px;font-weight:600;}
+  .masthead h1{font-size:44px;font-weight:700;margin:0 0 8px;line-height:1;}
   .masthead p{margin:0;color:var(--text-dim);font-size:14px;max-width:520px;}
 
   .hr{border:none;border-top:1px solid var(--border);margin:32px 0;}
@@ -29,61 +30,65 @@
   .layout{display:grid;grid-template-columns:260px 1fr;gap:40px;align-items:start;}
   @media (max-width:860px){.layout{grid-template-columns:1fr;}}
 
-  h2.section-label{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-faint);margin:0 0 16px;font-weight:600;}
+  h2.section-label{font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint);margin:0 0 16px;font-weight:700;
+    padding-left:10px;border-left:3px solid var(--accent);}
 
   .field{margin-bottom:16px;}
-  .field label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px;}
+  .field label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;}
   .field input[type=number], .field input[type=text], .field select{
-    width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);
-    padding:8px 10px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:13px;
+    width:100%;background:var(--surface-alt);border:1px solid var(--border);color:var(--text);
+    padding:9px 10px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:13px;
   }
   .field input:focus, .field select:focus{outline:none;border-color:var(--accent);}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 
   .chk{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
   .chk:last-child{border-bottom:none;}
-  .chk input{accent-color:var(--bad);width:15px;height:15px;}
+  .chk input{accent-color:var(--bad);width:16px;height:16px;}
 
-  .goal-focus{font-size:13px;color:var(--text);background:var(--accent-soft);border-left:2px solid var(--accent);padding:10px 14px;margin-bottom:28px;}
+  .goal-focus{font-size:13px;color:var(--text);background:var(--accent-soft);border-left:3px solid var(--accent);padding:10px 14px;margin-bottom:28px;}
 
-  .scoreboard{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:32px;}
-  .stat{padding:16px 18px;border-left:1px solid var(--border);}
-  .stat:first-child{border-left:none;}
+  .scoreboard{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:32px;}
+  .stat{padding:16px 18px;background:var(--surface);border-top:2px solid var(--border-strong);}
   .stat .lbl{font-size:10px;color:var(--text-faint);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;}
-  .stat .val{font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:600;}
+  .stat .val{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:700;}
   .stat .sub{font-size:11px;color:var(--text-faint);margin-top:3px;}
+  .stat.ok{border-top-color:var(--good);}
   .stat.ok .val{color:var(--good);}
+  .stat.bad{border-top-color:var(--bad);}
   .stat.bad .val{color:var(--bad);}
-  @media (max-width:640px){.scoreboard{grid-template-columns:repeat(2,1fr);}.stat:nth-child(2){border-left:none;}}
+  @media (max-width:640px){.scoreboard{grid-template-columns:repeat(2,1fr);}}
 
-  .body-section{display:grid;grid-template-columns:140px 1fr;gap:28px;padding-bottom:32px;margin-bottom:32px;border-bottom:1px solid var(--border);align-items:center;}
+  .body-section{display:grid;grid-template-columns:140px 1fr;gap:28px;padding:24px;margin-bottom:32px;
+    background:var(--surface);border:1px solid var(--border);align-items:center;}
   @media (max-width:640px){.body-section{grid-template-columns:1fr;}}
-  .joint{fill:var(--surface);stroke:var(--border-strong);stroke-width:2;transition:fill .2s,stroke .2s;}
+  .joint{fill:var(--surface-alt);stroke:var(--border-strong);stroke-width:2;transition:fill .2s,stroke .2s;}
   .joint-active{fill:var(--bad);stroke:var(--bad);}
-  .limb{stroke:var(--border-strong);stroke-width:2;fill:none;}
+  .limb{stroke:var(--border-strong);stroke-width:3;fill:none;}
   .notes-list{font-size:13px;color:var(--text-dim);}
   .notes-list .empty{color:var(--text-faint);}
   .note-row{display:flex;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);}
   .note-row:last-child{border-bottom:none;}
-  .note-dot{width:6px;height:6px;border-radius:50%;background:var(--bad);flex-shrink:0;margin-top:6px;}
+  .note-dot{width:7px;height:7px;border-radius:50%;background:var(--bad);flex-shrink:0;margin-top:6px;}
 
   .stage-picker{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:28px;}
-  .stage-btn{background:none;border:1px solid var(--border);color:var(--text-dim);
-    padding:8px 13px;border-radius:2px;font-size:12px;cursor:pointer;font-family:'Inter';}
-  .stage-btn:hover{border-color:var(--border-strong);}
-  .stage-btn.active{background:var(--text);border-color:var(--text);color:var(--bg);}
+  .stage-btn{background:var(--surface);border:1px solid var(--border);color:var(--text-dim);
+    padding:9px 14px;border-radius:2px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.03em;
+    cursor:pointer;font-family:'Inter';}
+  .stage-btn:hover{border-color:var(--border-strong);color:var(--text);}
+  .stage-btn.active{background:var(--accent);border-color:var(--accent);color:#1A0D08;}
 
   .stage-head{margin-bottom:16px;}
-  .stage-head h3{font-size:19px;margin:2px 0 0;font-weight:600;}
-  .stage-cardio{font-size:13px;color:var(--text-dim);padding:10px 0;border-top:1px solid var(--border);margin-top:6px;}
+  .stage-head h3{font-size:28px;margin:2px 0 0;font-weight:600;color:var(--accent-text);}
+  .stage-cardio{font-size:13px;color:var(--text-dim);padding:12px 14px;border-left:3px solid var(--good);background:var(--good-soft);margin-top:6px;}
   .stage-note{font-size:12px;color:var(--text-dim);padding-top:6px;}
 
   .days{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:8px;}
   .day-card{background:var(--surface);padding:18px;}
-  .day-card h4{font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-faint);margin:0 0 14px;font-weight:600;}
+  .day-card h4{font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--accent-text);margin:0 0 14px;font-weight:700;}
   .ex{padding:11px 0;border-bottom:1px solid var(--border);}
   .ex:last-child{border-bottom:none;}
-  .ex-name{font-size:14px;font-weight:500;}
+  .ex-name{font-size:14px;font-weight:600;}
   .ex-name.swapped{color:var(--text-faint);text-decoration:line-through;font-weight:400;}
   .ex-sets{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-dim);margin-top:3px;}
   .ex-cue{font-size:12px;color:var(--text-faint);margin-top:4px;font-style:italic;}
@@ -96,17 +101,17 @@
   @media (max-width:640px){.tips{grid-template-columns:1fr;}}
   .tip-panel ul{margin:0;padding-left:16px;font-size:13px;color:var(--text-dim);}
   .tip-panel li{margin-bottom:7px;}
-  .tip-panel li b{color:var(--text);font-weight:500;}
-  .sleep-msg{font-size:13px;padding:10px 0;margin-bottom:10px;border-top:1px solid var(--border);}
-  .sleep-msg.ok{color:var(--good);}
-  .sleep-msg.bad{color:var(--bad);}
-  .vitamin-focus{font-size:12px;color:var(--text);background:var(--accent-soft);border-left:2px solid var(--accent);padding:8px 12px;margin-bottom:12px;}
+  .tip-panel li b{color:var(--text);font-weight:600;}
+  .sleep-msg{font-size:13px;padding:10px 12px;margin-bottom:10px;border-left:3px solid var(--border-strong);}
+  .sleep-msg.ok{border-color:var(--good);background:var(--good-soft);color:var(--good);}
+  .sleep-msg.bad{border-color:var(--bad);background:var(--bad-soft);color:var(--bad);}
+  .vitamin-focus{font-size:12px;color:var(--text);background:var(--accent-soft);border-left:3px solid var(--accent);padding:8px 12px;margin-bottom:12px;}
 
   .compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--border);}
   .compare-row{display:contents;}
   .compare-cell{padding:14px 16px;border-bottom:1px solid var(--border);}
   .compare-cell.label{color:var(--text-dim);font-size:13px;display:flex;align-items:center;}
-  .compare-cell input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 9px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:13px;}
+  .compare-cell input{width:100%;background:var(--surface-alt);border:1px solid var(--border);color:var(--text);padding:7px 9px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:13px;}
   .compare-cell input:focus{outline:none;border-color:var(--accent);}
   .delta{grid-column:1 / -1;padding:14px 16px 4px;font-family:'IBM Plex Mono',monospace;font-size:13px;border-bottom:1px solid var(--border);}
   .delta .arrow{color:var(--text-faint);margin:0 8px;}
@@ -117,24 +122,24 @@
 
   .disclaimer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-size:11px;color:var(--text-faint);}
 
-  .calc-btn{width:100%;background:var(--text);color:var(--bg);border:none;border-radius:2px;
-    padding:12px 16px;font-family:'Inter';font-size:13px;font-weight:600;letter-spacing:0.02em;
-    cursor:pointer;margin-top:8px;}
-  .calc-btn:hover{background:var(--accent);}
+  .calc-btn{width:100%;background:var(--accent);color:#1A0D08;border:none;border-radius:2px;
+    padding:14px 16px;font-family:'Inter';font-size:14px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;
+    cursor:pointer;margin-top:16px;}
+  .calc-btn:hover{background:var(--accent-text);}
 
   .results-empty{font-size:13px;color:var(--text-faint);border:1px dashed var(--border-strong);
-    border-radius:2px;padding:28px 20px;text-align:center;max-width:420px;}
+    border-radius:2px;padding:28px 20px;text-align:center;max-width:420px;background:var(--surface);}
 
   .weight-note{font-size:12px;color:var(--text-dim);margin:-8px 0 16px;}
-  .ex-weight{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);margin-top:2px;}
+  .ex-weight{font-family:'IBM Plex Mono',monospace;font-weight:700;font-size:12px;color:var(--accent-text);margin-top:2px;}
 </style>
 </head>
 <body>
 <div class="wrap">
 
   <div class="masthead">
-    <p class="eyebrow">Персональная программа · для начинающих</p>
-    <h1>Годовой план тренировок</h1>
+    <p class="eyebrow">🏋 Персональная программа · для начинающих</p>
+    <h1 class="display">Годовой план тренировок</h1>
     <p>Задания с корректировкой техники, план под вашу цель, сравнение результатов до и после года тренировок.</p>
   </div>
 
@@ -495,7 +500,7 @@ function renderStageContent(){
   $('stage-content').innerHTML = `
     <div class="stage-head">
       <p class="eyebrow">${stage.months}</p>
-      <h3>${stage.title}</h3>
+      <h3 class="display">${stage.title}</h3>
     </div>
     <div class="days">${daysHtml}</div>
     <div class="stage-cardio">Кардио: ${stage.cardio}${CARDIO_GOAL_NOTE[goal]}</div>
