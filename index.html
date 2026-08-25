@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Годовой план тренировок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F7F7F4; --surface:#FFFFFF; --border:#E3E2DB; --border-strong:#CFCEC5;
+    --text:#17181A; --text-dim:#68675F; --text-faint:#A6A499;
+    --accent:#2C4A5E; --accent-soft:#EAEFF1;
+    --good:#4C6B4F; --good-soft:#EEF2EC;
+    --bad:#9A4A38; --bad-soft:#F6ECE9;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;line-height:1.6;font-size:14px;-webkit-font-smoothing:antialiased;}
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .wrap{max-width:1080px;margin:0 auto;padding:48px 24px 80px;}
+
+  .masthead{margin-bottom:40px;}
+  .eyebrow{font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-faint);margin:0 0 10px;}
+  .masthead h1{font-size:28px;font-weight:600;margin:0 0 6px;letter-spacing:-0.01em;}
+  .masthead p{margin:0;color:var(--text-dim);font-size:14px;max-width:520px;}
+
+  .hr{border:none;border-top:1px solid var(--border);margin:32px 0;}
+
+  .layout{display:grid;grid-template-columns:260px 1fr;gap:40px;align-items:start;}
+  @media (max-width:860px){.layout{grid-template-columns:1fr;}}
+
+  h2.section-label{font-size:11px;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-faint);margin:0 0 16px;font-weight:600;}
+
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12px;color:var(--text-dim);margin-bottom:6px;}
+  .field input[type=number], .field input[type=text], .field select{
+    width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);
+    padding:8px 10px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:13px;
+  }
+  .field input:focus, .field select:focus{outline:none;border-color:var(--accent);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  .chk{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
+  .chk:last-child{border-bottom:none;}
+  .chk input{accent-color:var(--bad);width:15px;height:15px;}
+
+  .goal-focus{font-size:13px;color:var(--text);background:var(--accent-soft);border-left:2px solid var(--accent);padding:10px 14px;margin-bottom:28px;}
+
+  .scoreboard{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:32px;}
+  .stat{padding:16px 18px;border-left:1px solid var(--border);}
+  .stat:first-child{border-left:none;}
+  .stat .lbl{font-size:10px;color:var(--text-faint);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:6px;}
+  .stat .val{font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:600;}
+  .stat .sub{font-size:11px;color:var(--text-faint);margin-top:3px;}
+  .stat.ok .val{color:var(--good);}
+  .stat.bad .val{color:var(--bad);}
+  @media (max-width:640px){.scoreboard{grid-template-columns:repeat(2,1fr);}.stat:nth-child(2){border-left:none;}}
+
+  .body-section{display:grid;grid-template-columns:140px 1fr;gap:28px;padding-bottom:32px;margin-bottom:32px;border-bottom:1px solid var(--border);align-items:center;}
+  @media (max-width:640px){.body-section{grid-template-columns:1fr;}}
+  .joint{fill:var(--surface);stroke:var(--border-strong);stroke-width:2;transition:fill .2s,stroke .2s;}
+  .joint-active{fill:var(--bad);stroke:var(--bad);}
+  .limb{stroke:var(--border-strong);stroke-width:2;fill:none;}
+  .notes-list{font-size:13px;color:var(--text-dim);}
+  .notes-list .empty{color:var(--text-faint);}
+  .note-row{display:flex;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);}
+  .note-row:last-child{border-bottom:none;}
+  .note-dot{width:6px;height:6px;border-radius:50%;background:var(--bad);flex-shrink:0;margin-top:6px;}
+
+  .stage-picker{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:28px;}
+  .stage-btn{background:none;border:1px solid var(--border);color:var(--text-dim);
+    padding:8px 13px;border-radius:2px;font-size:12px;cursor:pointer;font-family:'Inter';}
+  .stage-btn:hover{border-color:var(--border-strong);}
+  .stage-btn.active{background:var(--text);border-color:var(--text);color:var(--bg);}
+
+  .stage-head{margin-bottom:16px;}
+  .stage-head h3{font-size:19px;margin:2px 0 0;font-weight:600;}
+  .stage-cardio{font-size:13px;color:var(--text-dim);padding:10px 0;border-top:1px solid var(--border);margin-top:6px;}
+  .stage-note{font-size:12px;color:var(--text-dim);padding-top:6px;}
+
+  .days{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:8px;}
+  .day-card{background:var(--surface);padding:18px;}
+  .day-card h4{font-size:12px;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-faint);margin:0 0 14px;font-weight:600;}
+  .ex{padding:11px 0;border-bottom:1px solid var(--border);}
+  .ex:last-child{border-bottom:none;}
+  .ex-name{font-size:14px;font-weight:500;}
+  .ex-name.swapped{color:var(--text-faint);text-decoration:line-through;font-weight:400;}
+  .ex-sets{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-dim);margin-top:3px;}
+  .ex-cue{font-size:12px;color:var(--text-faint);margin-top:4px;font-style:italic;}
+  .ex-alt{font-size:13px;color:var(--bad);margin-top:7px;padding-left:10px;border-left:2px solid var(--bad);}
+  .ex-alt .cue{display:block;font-size:12px;color:var(--text-dim);font-style:italic;margin-top:3px;}
+  .ex-alt .tag{font-size:10px;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-faint);display:block;margin-top:3px;font-style:normal;}
+
+  .tips{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-bottom:8px;}
+  @media (max-width:860px){.tips{grid-template-columns:1fr 1fr;}}
+  @media (max-width:640px){.tips{grid-template-columns:1fr;}}
+  .tip-panel ul{margin:0;padding-left:16px;font-size:13px;color:var(--text-dim);}
+  .tip-panel li{margin-bottom:7px;}
+  .tip-panel li b{color:var(--text);font-weight:500;}
+  .sleep-msg{font-size:13px;padding:10px 0;margin-bottom:10px;border-top:1px solid var(--border);}
+  .sleep-msg.ok{color:var(--good);}
+  .sleep-msg.bad{color:var(--bad);}
+  .vitamin-focus{font-size:12px;color:var(--text);background:var(--accent-soft);border-left:2px solid var(--accent);padding:8px 12px;margin-bottom:12px;}
+
+  .compare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--border);}
+  .compare-row{display:contents;}
+  .compare-cell{padding:14px 16px;border-bottom:1px solid var(--border);}
+  .compare-cell.label{color:var(--text-dim);font-size:13px;display:flex;align-items:center;}
+  .compare-cell input{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:7px 9px;border-radius:2px;font-family:'IBM Plex Mono',monospace;font-size:13px;}
+  .compare-cell input:focus{outline:none;border-color:var(--accent);}
+  .delta{grid-column:1 / -1;padding:14px 16px 4px;font-family:'IBM Plex Mono',monospace;font-size:13px;border-bottom:1px solid var(--border);}
+  .delta .arrow{color:var(--text-faint);margin:0 8px;}
+  .delta.good{color:var(--good);}
+  .delta.bad{color:var(--bad);}
+  .delta.neutral{color:var(--text-faint);}
+  .compare-head{font-size:10px;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-faint);padding:0 16px 10px;}
+
+  .disclaimer{margin-top:40px;padding-top:18px;border-top:1px solid var(--border);font-size:11px;color:var(--text-faint);}
+
+  .calc-btn{width:100%;background:var(--text);color:var(--bg);border:none;border-radius:2px;
+    padding:12px 16px;font-family:'Inter';font-size:13px;font-weight:600;letter-spacing:0.02em;
+    cursor:pointer;margin-top:8px;}
+  .calc-btn:hover{background:var(--accent);}
+
+  .results-empty{font-size:13px;color:var(--text-faint);border:1px dashed var(--border-strong);
+    border-radius:2px;padding:28px 20px;text-align:center;max-width:420px;}
+
+  .weight-note{font-size:12px;color:var(--text-dim);margin:-8px 0 16px;}
+  .ex-weight{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--accent);margin-top:2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <p class="eyebrow">Персональная программа · для начинающих</p>
+    <h1>Годовой план тренировок</h1>
+    <p>Задания с корректировкой техники, план под вашу цель, сравнение результатов до и после года тренировок.</p>
+  </div>
+
+  <div class="layout">
+    <div>
+      <h2 class="section-label">Параметры</h2>
+      <div class="row2">
+        <div class="field"><label for="height">Рост, см</label><input type="number" id="height" value="175" min="120" max="230"></div>
+        <div class="field"><label for="weight">Вес, кг</label><input type="number" id="weight" value="72" min="30" max="220"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="age">Возраст</label><input type="number" id="age" value="30" min="14" max="90"></div>
+        <div class="field"><label for="gender">Пол</label>
+          <select id="gender">
+            <option value="avg">Не указывать</option>
+            <option value="male">Мужской</option>
+            <option value="female">Женский</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="goal">Цель</label>
+        <select id="goal">
+          <option value="balance">Общая физическая форма</option>
+          <option value="endurance">Выносливость</option>
+          <option value="loss">Снижение веса</option>
+          <option value="gain">Набор мышечной массы</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="sleep">Сон, часов в сутки</label>
+        <input type="number" id="sleep" value="7" min="3" max="12" step="0.5">
+      </div>
+
+      <hr class="hr">
+
+      <h2 class="section-label">Травмы и ограничения</h2>
+      <div class="chk"><input type="checkbox" id="inj-knees" value="knees"><label for="inj-knees">Колени</label></div>
+      <div class="chk"><input type="checkbox" id="inj-back" value="back"><label for="inj-back">Поясница / спина</label></div>
+      <div class="chk"><input type="checkbox" id="inj-shoulders" value="shoulders"><label for="inj-shoulders">Плечи</label></div>
+      <div class="chk"><input type="checkbox" id="inj-wrists" value="wrists"><label for="inj-wrists">Запястья / локти</label></div>
+      <div class="chk"><input type="checkbox" id="inj-ankles" value="ankles"><label for="inj-ankles">Голеностоп / стопы</label></div>
+
+      <button type="button" id="calc-btn" class="calc-btn">Рассчитать план</button>
+    </div>
+
+    <div>
+      <div id="results-empty" class="results-empty">
+        Заполните параметры слева и нажмите «Рассчитать план» — здесь появится
+        персональная программа с рабочими весами.
+      </div>
+
+      <div id="results" class="results" hidden>
+        <div class="scoreboard" id="scoreboard"></div>
+        <div class="goal-focus" id="goal-focus"></div>
+
+        <div class="body-section">
+          <svg viewBox="0 0 200 380" style="width:100%;max-width:130px;">
+            <line class="limb" x1="100" y1="70" x2="70" y2="118" />
+            <line class="limb" x1="70" y1="118" x2="48" y2="163" />
+            <line class="limb" x1="100" y1="70" x2="130" y2="118" />
+            <line class="limb" x1="130" y1="118" x2="152" y2="163" />
+            <line class="limb" x1="100" y1="75" x2="85" y2="178" />
+            <line class="limb" x1="85" y1="178" x2="82" y2="258" />
+            <line class="limb" x1="82" y1="258" x2="80" y2="330" />
+            <line class="limb" x1="100" y1="75" x2="115" y2="178" />
+            <line class="limb" x1="115" y1="178" x2="118" y2="258" />
+            <line class="limb" x1="118" y1="258" x2="120" y2="330" />
+            <circle cx="100" cy="42" r="20" fill="var(--surface)" stroke="var(--border-strong)" stroke-width="2" />
+            <circle id="shoulder-l" class="joint" cx="100" cy="70" r="8" />
+            <circle id="shoulder-r" class="joint" cx="100" cy="70" r="0" />
+            <rect id="back-rect" class="joint" x="83" y="150" width="34" height="32" rx="3" />
+            <circle id="wrist-l" class="joint" cx="48" cy="163" r="7" />
+            <circle id="wrist-r" class="joint" cx="152" cy="163" r="7" />
+            <circle id="knee-l" class="joint" cx="82" cy="258" r="8" />
+            <circle id="knee-r" class="joint" cx="118" cy="258" r="8" />
+            <circle id="ankle-l" class="joint" cx="80" cy="330" r="7" />
+            <circle id="ankle-r" class="joint" cx="120" cy="330" r="7" />
+          </svg>
+          <div>
+            <h2 class="section-label">Зоны риска</h2>
+            <div class="notes-list" id="injury-notes"><span class="empty">Отметьте травмы слева — здесь появятся зоны и пояснения по замене упражнений.</span></div>
+          </div>
+        </div>
+
+        <h2 class="section-label">Программа по этапам</h2>
+        <p class="weight-note">Рабочий вес — ориентировочный старт для новичка, привязан к весу тела и этапу программы. Подбирайте по ощущениям: последние 1–2 повторения в подходе должны даваться с усилием, но без нарушения техники.</p>
+        <div class="stage-picker" id="stage-picker"></div>
+        <div id="stage-content"></div>
+
+        <hr class="hr">
+
+        <h2 class="section-label">Питание и восстановление</h2>
+        <div class="tips">
+          <div class="tip-panel">
+            <h2 class="section-label">Сон</h2>
+            <div id="sleep-feedback"></div>
+            <ul>
+              <li>Ложитесь в одно и то же время, даже в выходные.</li>
+              <li>За час до сна — без экрана и яркого света.</li>
+              <li>Кофеин — не позднее чем за 6–8 часов до сна.</li>
+            </ul>
+          </div>
+          <div class="tip-panel">
+            <h2 class="section-label">Питание</h2>
+            <ul>
+              <li>Белок распределяйте на 3–4 приёма пищи в течение дня.</li>
+              <li>Овощи и клетчатка — в каждый основной приём пищи.</li>
+              <li>Вода: ориентир 30–35 мл на кг веса в день.</li>
+              <li>Минимизируйте добавленный сахар и алкоголь в силовые фазы.</li>
+            </ul>
+          </div>
+          <div class="tip-panel">
+            <h2 class="section-label">Витамины и микроэлементы</h2>
+            <div class="vitamin-focus" id="vitamin-focus"></div>
+            <ul id="vitamin-list"></ul>
+          </div>
+        </div>
+      </div>
+
+      <hr class="hr">
+
+      <h2 class="section-label">Результат: до и после года</h2>
+      <div class="compare-grid" id="compare-grid"></div>
+
+      <p class="disclaimer">Расчёты калорий, белка, ИМТ и рабочих весов, а также справочная информация о витаминах — ориентировочные, не медицинская рекомендация и не назначение дозировок. При травмах, хронических заболеваниях или перед приёмом добавок — консультация врача, тренера или нутрициолога, точная потребность в витаминах проверяется анализом крови.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+const EXLIB = {
+  squat:{name:'Приседания (с весом тела/штангой)',pattern:'knees',cue:'Колени по линии носков, спина нейтральна',alt:'Ягодичный мостик на полу',altCue:'Таз поднимать до прямой линии колено-плечо',note:'без осевой нагрузки на колено'},
+  lunge:{name:'Выпады',pattern:'knees',cue:'Корпус вертикально, колено не проваливается внутрь',alt:'Подъём таза на одной ноге',altCue:'Движение медленное, без рывка',note:'меньше сгибания в колене'},
+  pushup:{name:'Отжимания',pattern:'wrists',cue:'Локти под ~45°, тело — прямая линия',alt:'Жим гантелей лёжа, укороченная амплитуда',altCue:'Локти не разводить в стороны',note:'разгрузка запястий и плеч'},
+  row:{name:'Тяга в наклоне (гантели/штанга)',pattern:'back',cue:'Спина прямая, тянуть локтем назад',alt:'Тяга блока сидя',altCue:'Не раскачивать корпус',note:'без нагрузки на поясницу'},
+  plank:{name:'Планка',pattern:'wrists',cue:'Таз не провисает, живот втянут',alt:'Планка на предплечьях, укороченное время',altCue:'Плечи над локтями',note:'без опоры на запястья'},
+  hinge:{name:'Румынская тяга',pattern:'back',cue:'Сгиб в тазобедренном суставе, спина прямая',alt:'Гиперэкстензия в лёгком темпе',altCue:'Без рывка вверх, контроль на всей амплитуде',note:'контролируемая нагрузка на поясницу'},
+  overhead:{name:'Жим гантелей стоя',pattern:'shoulders',cue:'Не прогибаться в пояснице',alt:'Жим сидя с опорой на спинку',altCue:'Гантели двигаются строго вверх',note:'разгрузка поясницы и плеча'},
+  pull_vertical:{name:'Подтягивания / тяга верхнего блока',pattern:'shoulders',cue:'Тянуть грудью вверх, без раскачки',alt:'Тяга блока к груди, лёгкий вес',altCue:'Лопатки свести в нижней точке',note:'контроль амплитуды плеча'},
+  calf:{name:'Подъём на носки',pattern:'ankles',cue:'Полная амплитуда, пауза вверху',alt:'Изометрическая работа стопой сидя',altCue:'Держать напряжение 3–5 секунд',note:'без ударной нагрузки'},
+  situp:{name:'Скручивания',pattern:'back',cue:'Не тянуть шею руками, спина округляется от рёбер',alt:'Планка + втягивание живота',altCue:'Дыхание ровное, без задержки',note:'нейтральный позвоночник'},
+  cardio:{name:'Быстрая ходьба / велосипед',pattern:'ankles',cue:'Дыхание ровное, можете говорить фразами',alt:'Велотренажёр / плавание',altCue:'Темп комфортный, без боли в стопе',note:'без ударной нагрузки на стопу'},
+  hiit:{name:'Интервальный бег',pattern:'ankles',cue:'Ускорение — максимум, восстановление — контролируемо',alt:'Интервалы на велотренажёре',altCue:'Тот же ритм ускорение/восстановление',note:'без ударной нагрузки на колено/голеностоп'}
+};
+const INJURY_LABELS = {knees:'колени',back:'поясница / спина',shoulders:'плечи',wrists:'запястья / локти',ankles:'голеностоп / стопы'};
+const GOAL_FOCUS = {
+  balance:'Сбалансированный подход: силовые и кардио в равном объёме, повторения 8–12.',
+  endurance:'Акцент на выносливость: кардио-дни длиннее и чаще, силовые — в поддерживающем объёме, повторения 15–20.',
+  loss:'Акцент на снижение веса: небольшой дефицит калорий и повышенный объём кардио, повторения 12–15.',
+  gain:'Акцент на набор массы: небольшой профицит калорий, отдых между подходами 90–120 сек, повторения 6–10.'
+};
+/* F: диапазон повторений в силовых упражнениях зависит от цели (см. PRD 6.4) */
+const REP_RANGE_BY_GOAL = {balance:'8–12', endurance:'15–20', loss:'12–15', gain:'6–10'};
+const CARDIO_GOAL_NOTE = {
+  balance:'',
+  endurance:' Для цели «выносливость» — держите длительность у верхней границы указанного диапазона.',
+  loss:' Для цели «снижение веса» — старайтесь выполнять кардио у верхней границы диапазона и не пропускать сессии.',
+  gain:' Для цели «набор массы» — кардио можно держать у нижней границы диапазона, чтобы не мешать восстановлению.'
+};
+
+/* Ориентировочный рабочий вес для упражнений со свободным весом:
+   вес = вес тела × коэффициент упражнения × коэффициент пола × прогрессия этапа,
+   округлено до шага снаряда. Упражнения без записи здесь — вес тела (без нагрузки). */
+const EX_WEIGHT = {
+  squat:{coef:0.55, round:2.5},
+  hinge:{coef:0.45, round:2.5},
+  calf:{coef:0.35, round:2.5},
+  row:{coef:0.30, round:1, perHand:true},
+  lunge:{coef:0.15, round:1, perHand:true},
+  overhead:{coef:0.20, round:1, perHand:true}
+};
+const GENDER_STRENGTH_ADJ = {male:1, female:0.65, avg:0.8};
+/* прогрессивная перегрузка по этапам (F, PRD 6.4), лёгкий деload на этапе теста */
+const STAGE_LOAD_MULT = {1:0.6, 2:0.75, 3:0.9, 4:1.0, 5:1.1, 6:0.9};
+
+function computeWeight(exKey, stageId){
+  const model = EX_WEIGHT[exKey];
+  if(!model) return null;
+  const w = parseFloat($('weight').value)||72;
+  const genderAdj = GENDER_STRENGTH_ADJ[$('gender').value] ?? GENDER_STRENGTH_ADJ.avg;
+  const raw = w * model.coef * genderAdj * STAGE_LOAD_MULT[stageId];
+  const value = Math.max(model.round, Math.round(raw/model.round)*model.round);
+  return {value, perHand: !!model.perHand};
+}
+
+function weightLabel(exKey, stageId){
+  const w = computeWeight(exKey, stageId);
+  if(!w) return 'вес тела';
+  return `≈ ${w.value} кг${w.perHand ? ' в руке' : ''}`;
+}
+
+const VITAMINS = [
+  {name:'Витамин D', role:'поддержка костей и иммунитета, синтезируется при солнечном свете'},
+  {name:'B12', role:'энергетический обмен и работа нервной системы'},
+  {name:'Железо', role:'перенос кислорода к мышцам, особенно важно при кардионагрузках'},
+  {name:'Магний', role:'мышечное расслабление и восстановление после тренировок'},
+  {name:'Омега-3', role:'снижение воспаления, здоровье суставов и сердца'},
+  {name:'Витамин C', role:'антиоксидантная защита и усвоение железа'},
+  {name:'Кальций', role:'плотность костей, особенно при силовых и ударных нагрузках'}
+];
+const VITAMIN_FOCUS = {
+  balance:'Общий акцент — <b>витамин D</b> и <b>B12</b> для стабильной энергии в течение дня.',
+  endurance:'Из-за более высокой аэробной нагрузки обратите внимание на <b>железо</b> и <b>B12</b> — они участвуют в переносе кислорода.',
+  loss:'При дефиците калорий выше риск нехватки <b>железа</b> и <b>кальция</b> — рацион должен оставаться разнообразным.',
+  gain:'Для восстановления и роста мышц важны <b>магний</b> и <b>омега-3</b> — на фоне возросшего объёма силовой нагрузки.'
+};
+
+const STAGES = [
+ {id:1,months:'Месяцы 1–2',title:'Адаптация',
+  days:[{label:'Тренировка · ×3 в неделю',items:[
+    {key:'squat',sets:'3×{R}'},{key:'pushup',sets:'3×{R}'},{key:'row',sets:'3×{R}'},
+    {key:'plank',sets:'3×20–30 сек'},{key:'lunge',sets:'2×{R} на ногу'}]}],
+  cardio:'2× в неделю по 20–30 минут — быстрая ходьба или лёгкий велосипед, пульс 60–70% от максимума.'},
+ {id:2,months:'Месяцы 3–4',title:'Построение базы',
+  days:[
+   {label:'День A · Низ тела',items:[{key:'squat',sets:'4×{R}'},{key:'hinge',sets:'3×{R}'},{key:'lunge',sets:'3×{R} на ногу'},{key:'calf',sets:'3×15'},{key:'situp',sets:'3 подхода'}]},
+   {label:'День B · Верх тела',items:[{key:'pushup',sets:'4×{R}'},{key:'row',sets:'4×{R}'},{key:'overhead',sets:'3×{R}'},{key:'pull_vertical',sets:'3×{R}'},{key:'plank',sets:'3 подхода'}]}
+  ], cardio:'2× в неделю, 25–35 минут, можно добавлять интервалы (1 мин быстро / 2 мин медленно).'},
+ {id:3,months:'Месяцы 5–6',title:'Прогрессивная перегрузка',
+  days:[
+   {label:'День 1 · Толчок',items:[{key:'pushup',sets:'4×{R}'},{key:'overhead',sets:'3×{R}'},{key:'plank',sets:'3 подхода'}]},
+   {label:'День 2 · Тяга',items:[{key:'row',sets:'4×{R}'},{key:'pull_vertical',sets:'3×{R}'},{key:'situp',sets:'3 подхода'}]},
+   {label:'День 3 · Ноги',items:[{key:'squat',sets:'4×{R}'},{key:'hinge',sets:'3×{R}'},{key:'lunge',sets:'3×{R} на ногу'},{key:'calf',sets:'3×15'}]}
+  ], cardio:'1 день функционального кардио в неделю — круговая тренировка 20 минут.'},
+ {id:4,months:'Месяцы 7–8',title:'Интенсификация',
+  days:[
+   {label:'День 1 · Толчок + Тяга (суперсеты)',items:[{key:'pushup',sets:'3×{R}'},{key:'row',sets:'3×{R}'},{key:'overhead',sets:'3×{R}'},{key:'pull_vertical',sets:'3×{R}'},{key:'plank',sets:'3 подхода'}]},
+   {label:'День 2 · Ноги',items:[{key:'squat',sets:'4×{R}'},{key:'hinge',sets:'3×{R}'},{key:'lunge',sets:'3×{R} на ногу'},{key:'calf',sets:'3×15'}]},
+   {label:'День 3 · Кардио + Кор',items:[{key:'hiit',sets:'15–20 мин интервалов'},{key:'situp',sets:'3 подхода'},{key:'plank',sets:'3 подхода'}]}
+  ], cardio:'1× HIIT 15–20 минут + 1× длительное кардио 30–40 минут, плюс 1 занятие растяжкой.'},
+ {id:5,months:'Месяцы 9–10',title:'Специализация',
+  days:[
+   {label:'День 1 · Толчок',items:[{key:'pushup',sets:'3×{R}'},{key:'overhead',sets:'3×{R}'},{key:'plank',sets:'3 подхода'}]},
+   {label:'День 2 · Тяга',items:[{key:'row',sets:'4×{R}'},{key:'pull_vertical',sets:'3×{R}'},{key:'situp',sets:'3 подхода'}]},
+   {label:'День 3 · Ноги',items:[{key:'squat',sets:'4×{R}'},{key:'hinge',sets:'3×{R}'},{key:'lunge',sets:'3×{R} на ногу'},{key:'calf',sets:'3×15'}]}
+  ], cardio:'Объём кардио зависит от цели — см. фокус этапа вверху страницы.'},
+ {id:6,months:'Месяцы 11–12',title:'Консолидация и тест',
+  days:[
+   {label:'Поддерживающий режим · недели 1–3',items:[{key:'squat',sets:'3×{R}'},{key:'pushup',sets:'3×{R}'},{key:'row',sets:'3×{R}'},{key:'hinge',sets:'2×{R}'},{key:'plank',sets:'3 подхода'}]},
+   {label:'Неделя 4 · Тестирование',items:[{key:'squat',sets:'макс. за 1 мин',test:true},{key:'pushup',sets:'макс. за подход',test:true},{key:'plank',sets:'время удержания',test:true},{key:'cardio',sets:'тест 2 км на время',test:true}]}
+  ], cardio:'Умеренный объём в недели 1–3, лёгкая разминка перед тестированием в неделю 4.'}
+];
+
+const COMPARE_METRICS = [
+ {key:'weight', label:'Вес, кг', direction:'context'},
+ {key:'pushups', label:'Отжимания, макс. за подход', direction:'up'},
+ {key:'squats1min', label:'Приседания за 1 мин', direction:'up'},
+ {key:'plank', label:'Планка, сек', direction:'up'},
+ {key:'run2km', label:'Бег 2 км, мин', direction:'down'}
+];
+
+let currentStage = 1;
+
+function $(id){return document.getElementById(id);}
+function getInjuries(){
+  return ['knees','back','shoulders','wrists','ankles'].filter(k => $('inj-'+k).checked);
+}
+
+function computeMetrics(){
+  const h = parseFloat($('height').value)||175;
+  const w = parseFloat($('weight').value)||72;
+  const a = parseFloat($('age').value)||30;
+  const gender = $('gender').value;
+  const goal = $('goal').value;
+
+  const bmrMale = 10*w + 6.25*h - 5*a + 5;
+  const bmrFemale = 10*w + 6.25*h - 5*a - 161;
+  const bmr = gender==='male' ? bmrMale : gender==='female' ? bmrFemale : (bmrMale+bmrFemale)/2;
+  const tdee = bmr*1.375;
+  const mult = goal==='loss' ? 0.85 : goal==='gain' ? 1.10 : 1.0;
+  const calories = Math.round(tdee*mult/10)*10;
+  const proteinPerKg = goal==='gain' ? 2.0 : goal==='loss' ? 1.8 : 1.6;
+  const protein = Math.round(w*proteinPerKg);
+
+  const bmi = w/((h/100)**2);
+  let bmiLabel, bmiClass;
+  if(bmi<18.5){bmiLabel='ниже нормы';bmiClass='';}
+  else if(bmi<25){bmiLabel='норма';bmiClass='ok';}
+  else if(bmi<30){bmiLabel='выше нормы';bmiClass='';}
+  else {bmiLabel='значительно выше нормы';bmiClass='bad';}
+
+  return {calories, protein, bmi: bmi.toFixed(1), bmiLabel, bmiClass};
+}
+
+function sleepFeedback(){
+  const s = parseFloat($('sleep').value)||7;
+  if(s>=7 && s<=9) return {cls:'ok', statClass:'ok', text:'В пределах рекомендованных 7–9 часов — восстановление должно быть достаточным.'};
+  if(s>=6 && s<7) return {cls:'', statClass:'', text:'Немного меньше нормы. Добавьте 30–60 минут сна — иначе прогресс в силе будет медленнее.'};
+  if(s<6) return {cls:'bad', statClass:'bad', text:'Существенный недосып. Восстановление страдает — пересмотрите режим сна перед стартом программы.'};
+  return {cls:'', statClass:'', text:'Больше 9 часов обычно не проблема, но если днём сохраняется сонливость — обратите внимание на качество сна.'};
+}
+
+function renderScoreboard(){
+  const m = computeMetrics();
+  const sf = sleepFeedback();
+  $('scoreboard').innerHTML = `
+    <div class="stat ${m.bmiClass}"><div class="lbl">ИМТ</div><div class="val mono">${m.bmi}</div><div class="sub">${m.bmiLabel}</div></div>
+    <div class="stat"><div class="lbl">Калории/день</div><div class="val mono">${m.calories.toLocaleString('ru-RU')}</div><div class="sub">ориентир под цель</div></div>
+    <div class="stat"><div class="lbl">Белок/день</div><div class="val mono">${m.protein} г</div><div class="sub">${(m.protein/(parseFloat($('weight').value)||72)).toFixed(1)} г/кг</div></div>
+    <div class="stat ${sf.statClass}"><div class="lbl">Сон</div><div class="val mono">${$('sleep').value} ч</div><div class="sub">ориентир 7–9 ч</div></div>
+  `;
+  $('sleep-feedback').innerHTML = `<div class="sleep-msg ${sf.cls}">${sf.text}</div>`;
+  $('goal-focus').textContent = GOAL_FOCUS[$('goal').value];
+}
+
+function renderVitamins(){
+  const goal = $('goal').value;
+  $('vitamin-focus').innerHTML = VITAMIN_FOCUS[goal];
+  $('vitamin-list').innerHTML = VITAMINS.map(v => `<li><b>${v.name}</b> — ${v.role}</li>`).join('');
+}
+
+function renderBodyMap(){
+  const injuries = getInjuries();
+  const map = {shoulders:['shoulder-l'], wrists:['wrist-l','wrist-r'], knees:['knee-l','knee-r'], ankles:['ankle-l','ankle-r'], back:['back-rect']};
+  Object.entries(map).forEach(([inj, ids]) => {
+    const active = injuries.includes(inj);
+    ids.forEach(id => { const el = $(id); if(el) el.setAttribute('class', active ? 'joint joint-active' : 'joint'); });
+  });
+  if(injuries.length===0){
+    $('injury-notes').innerHTML = '<span class="empty">Отметьте травмы слева — здесь появятся зоны и пояснения по замене упражнений.</span>';
+  } else {
+    $('injury-notes').innerHTML = injuries.map(inj => `
+      <div class="note-row"><div class="note-dot"></div><div><b>${INJURY_LABELS[inj]}</b> — упражнения с нагрузкой на эту зону заменены на более щадящие варианты в плане ниже.</div></div>
+    `).join('');
+  }
+}
+
+function renderStagePicker(){
+  $('stage-picker').innerHTML = STAGES.map(s => `<button class="stage-btn ${s.id===currentStage?'active':''}" data-stage="${s.id}">Этап ${s.id} · ${s.months}</button>`).join('');
+  document.querySelectorAll('.stage-btn').forEach(btn => btn.addEventListener('click', () => { currentStage = parseInt(btn.dataset.stage); renderAll(); }));
+}
+
+function renderStageContent(){
+  const stage = STAGES.find(s => s.id===currentStage);
+  const injuries = getInjuries();
+  const goal = $('goal').value;
+  const repRange = REP_RANGE_BY_GOAL[goal];
+
+  const daysHtml = stage.days.map(day => {
+    const itemsHtml = day.items.map(item => {
+      const ex = EXLIB[item.key];
+      const risky = injuries.includes(ex.pattern);
+      const setsText = item.sets.replace('{R}', repRange);
+      const weightText = risky ? 'вес тела' : weightLabel(item.key, stage.id);
+      const showWeight = !item.test;
+      return `
+        <div class="ex">
+          <div class="ex-name ${risky?'swapped':''}">${ex.name}</div>
+          <div class="ex-sets">${setsText}</div>
+          ${!risky ? `${showWeight ? `<div class="ex-weight">${weightText}</div>` : ''}<div class="ex-cue">${ex.cue}</div>` : ''}
+          ${risky ? `<div class="ex-alt">${ex.alt}<span class="cue">${ex.altCue}</span><span class="tag">${showWeight ? weightText+' · ' : ''}${ex.note} · из-за: ${INJURY_LABELS[ex.pattern]}</span></div>` : ''}
+        </div>`;
+    }).join('');
+    return `<div class="day-card"><h4>${day.label}</h4>${itemsHtml}</div>`;
+  }).join('');
+
+  $('stage-content').innerHTML = `
+    <div class="stage-head">
+      <p class="eyebrow">${stage.months}</p>
+      <h3>${stage.title}</h3>
+    </div>
+    <div class="days">${daysHtml}</div>
+    <div class="stage-cardio">Кардио: ${stage.cardio}${CARDIO_GOAL_NOTE[goal]}</div>
+  `;
+}
+
+function metricDelta(metric, start, end){
+  if(start==='' || end==='' || isNaN(start) || isNaN(end)) return null;
+  const s = parseFloat(start), e = parseFloat(end);
+  const diff = e - s;
+  let cls = 'neutral', sign = diff>0?'+':'';
+  if(metric.direction==='up') cls = diff>0?'good':diff<0?'bad':'neutral';
+  else if(metric.direction==='down') cls = diff<0?'good':diff>0?'bad':'neutral';
+  return {diff: sign+diff.toFixed(diff%1!==0?1:0), cls};
+}
+
+function renderCompare(){
+  const rows = COMPARE_METRICS.map(m => {
+    const startId = 'cmp-start-'+m.key, endId = 'cmp-end-'+m.key;
+    return `
+      <div class="compare-cell label">${m.label}</div>
+      <div class="compare-cell"><input type="number" id="${startId}" placeholder="старт" step="any"></div>
+      <div class="compare-cell"><input type="number" id="${endId}" placeholder="через год" step="any"></div>
+      <div class="delta neutral" id="delta-${m.key}"></div>
+    `;
+  }).join('');
+  $('compare-grid').innerHTML = `
+    <div class="compare-head">Показатель</div><div class="compare-head">Старт</div><div class="compare-head">Через год</div>
+    ${rows}
+  `;
+  COMPARE_METRICS.forEach(m => {
+    ['cmp-start-'+m.key, 'cmp-end-'+m.key].forEach(id => $(id).addEventListener('input', () => updateDelta(m)));
+  });
+}
+
+function updateDelta(m){
+  const start = $('cmp-start-'+m.key).value, end = $('cmp-end-'+m.key).value;
+  const el = $('delta-'+m.key);
+  const d = metricDelta(m, start, end);
+  if(!d){ el.textContent = ''; el.className = 'delta neutral'; return; }
+  el.textContent = `Изменение: ${d.diff}`;
+  el.className = 'delta ' + d.cls;
+}
+
+function renderAll(){
+  renderScoreboard();
+  renderVitamins();
+  renderBodyMap();
+  renderStagePicker();
+  renderStageContent();
+}
+
+let calculated = false;
+
+function calculate(){
+  calculated = true;
+  currentStage = 1;
+  renderAll();
+  $('results-empty').hidden = true;
+  $('results').hidden = false;
+}
+
+$('calc-btn').addEventListener('click', calculate);
+['knees','back','shoulders','wrists','ankles'].forEach(k => $('inj-'+k).addEventListener('change', () => { if(calculated) renderAll(); }));
+
+renderCompare();
+</script>
+</body>
+</html>
